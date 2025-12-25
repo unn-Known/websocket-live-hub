@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebSocket Live Connection Hub - Advanced</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-advanced.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 <body>
@@ -14,107 +14,260 @@
                 <h1>🚀 WebSocket Live Connection Hub</h1>
                 <div class="header-buttons">
                     <button id="darkModeBtn" class="btn btn-icon" title="Toggle Dark Mode">🌙</button>
+                    <button id="helpBtn" class="btn btn-icon" title="Help">ℹ️</button>
                 </div>
             </div>
             <p>Real-Time Data Streaming with Advanced Analytics</p>
         </header>
 
         <nav class="tabs">
-            <button class="tab-btn active" data-tab="connection">Connection</button>
-            <button class="tab-btn" data-tab="analytics">Analytics</button>
-            <button class="tab-btn" data-tab="alerts">Alerts</button>
-            <button class="tab-btn" data-tab="history">History</button>
-            <button class="tab-btn" data-tab="export">Export</button>
+            <button class="tab-btn active" data-tab="connection">📡 Connection</button>
+            <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
+            <button class="tab-btn" data-tab="alerts">🔔 Alerts</button>
+            <button class="tab-btn" data-tab="history">📋 History</button>
+            <button class="tab-btn" data-tab="export">💾 Export</button>
         </nav>
-            <!-- Connection Configuration Section -->
-            <section class="config-section">
-                <h2>Connection Configuration</h2>
-                <div class="form-group">
-                    <label for="wsUrl">WebSocket URL:</label>
-                    <input 
-                        type="text" 
-                        id="wsUrl" 
-                        placeholder="Enter WebSocket URL (e.g., wss://example.com/socket)"
-                        value="wss://stream.binance.com:9443/ws/bchusdc@ticker"
-                    >
-                </div>
-                
-                <div class="form-group">
-                    <label>Preset URLs:</label>
-                    <div class="preset-buttons">
-                        <button class="btn btn-preset" data-url="wss://stream.binance.com:9443/ws/bchusdc@ticker">
-                            Binance BCH/USDC
-                        </button>
-                        <button class="btn btn-preset" data-url="wss://stream.binance.com:9443/ws/btcusdt@ticker">
-                            Binance BTC/USDT
-                        </button>
-                        <button class="btn btn-preset" data-url="wss://stream.binance.com:9443/ws/ethusdt@ticker">
-                            Binance ETH/USDT
-                        </button>
-                        <button class="btn btn-preset" data-url="wss://echo.websocket.org">
-                            Echo Server (Test)
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="button-group">
-                    <button id="connectBtn" class="btn btn-primary">Connect</button>
-                    <button id="disconnectBtn" class="btn btn-danger" disabled>Disconnect</button>
-                    <button id="clearBtn" class="btn btn-secondary">Clear Log</button>
-                </div>
-            </section>
 
-            <!-- Status Section -->
-            <section class="status-section">
-                <h2>Connection Status</h2>
-                <div class="status-indicator">
-                    <span id="statusDot" class="status-dot disconnected"></span>
-                    <span id="statusText">Disconnected</span>
-                </div>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Server:</label>
-                        <span id="serverInfo">Not connected</span>
+        <main>
+            <!-- CONNECTION TAB -->
+            <div class="tab-content active" id="connection-tab">
+                <!-- Connection Configuration Section -->
+                <section class="card">
+                    <h2>Connection Configuration</h2>
+                    <div class="form-group">
+                        <label for="wsUrl">WebSocket URL:</label>
+                        <input 
+                            type="text" 
+                            id="wsUrl" 
+                            placeholder="Enter WebSocket URL (e.g., wss://example.com/socket)"
+                            value="wss://stream.binance.com:9443/ws/bchusdc@ticker"
+                        >
                     </div>
-                    <div class="info-item">
-                        <label>Connection Time:</label>
-                        <span id="connectionTime">--:--:--</span>
+                    
+                    <div class="form-group">
+                        <label>Preset URLs:</label>
+                        <div class="preset-buttons">
+                            <button class="btn btn-preset" data-url="wss://stream.binance.com:9443/ws/bchusdc@ticker">
+                                Binance BCH/USDC
+                            </button>
+                            <button class="btn btn-preset" data-url="wss://stream.binance.com:9443/ws/btcusdt@ticker">
+                                Binance BTC/USDT
+                            </button>
+                            <button class="btn btn-preset" data-url="wss://stream.binance.com:9443/ws/ethusdt@ticker">
+                                Binance ETH/USDT
+                            </button>
+                            <button class="btn btn-preset" data-url="wss://echo.websocket.org">
+                                Echo Server (Test)
+                            </button>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <label>Messages Received:</label>
-                        <span id="messageCount">0</span>
-                    </div>
-                </div>
-            </section>
 
-            <!-- Message Input Section -->
-            <section class="input-section">
-                <h2>Send Message</h2>
-                <div class="form-group">
-                    <label for="messageInput">Message:</label>
-                    <textarea 
-                        id="messageInput" 
-                        placeholder="Enter message to send (JSON format recommended)"
-                        rows="3"
-                    ></textarea>
-                </div>
-                <button id="sendBtn" class="btn btn-primary" disabled>Send Message</button>
-            </section>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="autoReconnect" checked>
+                            Auto-Reconnect on Disconnect
+                        </label>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="connectBtn" class="btn btn-primary">Connect</button>
+                        <button id="disconnectBtn" class="btn btn-danger" disabled>Disconnect</button>
+                        <button id="clearBtn" class="btn btn-secondary">Clear Log</button>
+                    </div>
+                </section>
 
-            <!-- Log Section -->
-            <section class="log-section">
-                <h2>Live Event Log</h2>
-                <div id="logContainer" class="log-container">
-                    <div class="log-entry info">System ready. Configure and connect to a WebSocket server.</div>
-                </div>
-            </section>
+                <!-- Status Section -->
+                <section class="card">
+                    <h2>Connection Status</h2>
+                    <div class="status-indicator">
+                        <span id="statusDot" class="status-dot disconnected"></span>
+                        <span id="statusText">Disconnected</span>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Server:</label>
+                            <span id="serverInfo">Not connected</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Connection Time:</label>
+                            <span id="connectionTime">--:--:--</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Messages Received:</label>
+                            <span id="messageCount">0</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Reconnect Attempts:</label>
+                            <span id="reconnectCount">0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Message Input Section -->
+                <section class="card">
+                    <h2>Send Message</h2>
+                    <div class="form-group">
+                        <label for="messageInput">Message:</label>
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Enter message to send (JSON format recommended)"
+                            rows="3"
+                        ></textarea>
+                    </div>
+                    <button id="sendBtn" class="btn btn-primary" disabled>Send Message (Ctrl+Enter)</button>
+                </section>
+
+                <!-- Log Section -->
+                <section class="card">
+                    <div class="section-header">
+                        <h2>Live Event Log</h2>
+                        <input 
+                            type="text" 
+                            id="filterInput" 
+                            class="filter-input" 
+                            placeholder="🔍 Filter messages..."
+                        >
+                    </div>
+                    <div id="logContainer" class="log-container">
+                        <div class="log-entry info">System ready. Configure and connect to a WebSocket server.</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ANALYTICS TAB -->
+            <div class="tab-content" id="analytics-tab">
+                <section class="card">
+                    <h2>📊 Real-Time Analytics Dashboard</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Messages</div>
+                            <div class="stat-value" id="statTotalMessages">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Messages/Sec</div>
+                            <div class="stat-value" id="statMessagesPerSec">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Average Size</div>
+                            <div class="stat-value" id="statAvgSize">0 B</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Uptime</div>
+                            <div class="stat-value" id="statUptime">00:00:00</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Message Rate</h3>
+                            <canvas id="messageRateChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Message Types</h3>
+                            <canvas id="messageTypesChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Data Flow</h3>
+                            <canvas id="dataFlowChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Price Trend (if available)</h3>
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ALERTS TAB -->
+            <div class="tab-content" id="alerts-tab">
+                <section class="card">
+                    <h2>🔔 Alert Configuration</h2>
+                    
+                    <div class="alert-setup">
+                        <div class="form-group">
+                            <label for="alertField">Monitor Field:</label>
+                            <input type="text" id="alertField" placeholder="e.g., lastPrice, price, value">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="alertCondition">Condition:</label>
+                                <select id="alertCondition">
+                                    <option value="greater">Greater than (>)</option>
+                                    <option value="less">Less than (<)</option>
+                                    <option value="equals">Equals (=)</option>
+                                    <option value="contains">Contains</option>
+                                    <option value="change">Changed by %</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="alertValue">Value:</label>
+                                <input type="text" id="alertValue" placeholder="e.g., 50000">
+                            </div>
+                        </div>
+                        
+                        <button id="addAlertBtn" class="btn btn-primary">Add Alert</button>
+                    </div>
+
+                    <div id="alertsList" class="alerts-list"></div>
+                    
+                    <div id="alertsLog" class="alerts-log">
+                        <h3>Alert History</h3>
+                        <div class="log-container"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- HISTORY TAB -->
+            <div class="tab-content" id="history-tab">
+                <section class="card">
+                    <h2>📋 Connection History</h2>
+                    
+                    <div class="button-group">
+                        <button id="clearHistoryBtn" class="btn btn-danger">Clear History</button>
+                    </div>
+                    
+                    <div id="historyList" class="history-list"></div>
+                </section>
+            </div>
+
+            <!-- EXPORT TAB -->
+            <div class="tab-content" id="export-tab">
+                <section class="card">
+                    <h2>💾 Export Data</h2>
+                    
+                    <div class="export-options">
+                        <div class="form-group">
+                            <label for="exportFormat">Format:</label>
+                            <select id="exportFormat">
+                                <option value="json">JSON</option>
+                                <option value="csv">CSV</option>
+                                <option value="txt">Text</option>
+                            </select>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button id="exportDataBtn" class="btn btn-primary">Export Messages</button>
+                            <button id="exportStatsBtn" class="btn btn-primary">Export Statistics</button>
+                            <button id="exportChartBtn" class="btn btn-primary">Export Charts</button>
+                        </div>
+                    </div>
+
+                    <div class="export-preview">
+                        <h3>Export Preview</h3>
+                        <pre id="exportPreview">No data to export yet. Connect and receive messages first.</pre>
+                    </div>
+                </section>
+            </div>
         </main>
 
         <footer>
-            <p>&copy; 2025 WebSocket Live Connection Hub | Systematic Format</p>
+            <p>&copy; 2025 WebSocket Live Connection Hub | Advanced Edition with Analytics</p>
         </footer>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app-advanced.js"></script>
 </body>
 </html>
