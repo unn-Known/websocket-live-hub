@@ -3,17 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Live Connection</title>
+    <title>WebSocket Live Connection Hub - Advanced</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>WebSocket Live Connection Hub</h1>
-            <p>Connect to external WebSocket servers and receive live data</p>
+            <div class="header-top">
+                <h1>🚀 WebSocket Live Connection Hub</h1>
+                <div class="header-buttons">
+                    <button id="darkModeBtn" class="btn btn-icon" title="Toggle Dark Mode">🌙</button>
+                </div>
+            </div>
+            <p>Real-Time Data Streaming with Advanced Analytics</p>
         </header>
 
-        <main>
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="connection">Connection</button>
+            <button class="tab-btn" data-tab="analytics">Analytics</button>
+            <button class="tab-btn" data-tab="alerts">Alerts</button>
+            <button class="tab-btn" data-tab="history">History</button>
+            <button class="tab-btn" data-tab="export">Export</button>
+        </nav>
             <!-- Connection Configuration Section -->
             <section class="config-section">
                 <h2>Connection Configuration</h2>
