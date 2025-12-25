@@ -1,19 +1,10 @@
 {
   "version": 2,
-  "builds": [
+  "public": true,
+  "rewrites": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "source": "/(.*)",
+      "destination": "/"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "server.js"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "regions": ["iad1"]
+  ]
 }
