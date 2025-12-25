@@ -1,4 +1,4 @@
-node_modules/
+﻿node_modules/
 .vercel/
 .env
 .env.local
@@ -13,4 +13,3 @@ build/
 .next/
 out/
 .cache/
-.git/
