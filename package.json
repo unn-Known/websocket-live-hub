@@ -1,0 +1,23 @@
+{
+  "name": "websocket-live-connection-hub",
+  "version": "1.0.0",
+  "description": "Real-time WebSocket connection hub for streaming live data from external sources",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "websocket",
+    "real-time",
+    "live-streaming",
+    "binance",
+    "cryptocurrency",
+    "socket"
+  ],
+  "author": "WebSocket Hub",
+  "license": "MIT",
+  "engines": {
+    "node": "18.x"
+  }
+}
