@@ -43,6 +43,18 @@ class AdvancedWebSocketManager {
         this.darkModeBtn = document.getElementById('darkModeBtn');
         this.filterInput = document.getElementById('filterInput');
         
+        // Import XML elements
+        this.importUrl = document.getElementById('importUrl');
+        this.importXpath = document.getElementById('importXpath');
+        this.importMode = document.getElementById('importMode');
+        this.importLimit = document.getElementById('importLimit');
+        this.importBtn = document.getElementById('importBtn');
+        this.importClearBtn = document.getElementById('importClearBtn');
+        this.importStatus = document.getElementById('importStatus');
+        this.importResults = document.getElementById('importResults');
+        this.importHistory = document.getElementById('importHistory');
+        this.importQueries = [];
+        
         // Tab buttons
         this.tabBtns = document.querySelectorAll('.tab-btn');
         this.tabContents = document.querySelectorAll('.tab-content');
@@ -94,6 +106,16 @@ class AdvancedWebSocketManager {
                 this.wsUrlInput.value = e.target.getAttribute('data-url');
                 this.log(`WebSocket URL set to: ${e.target.getAttribute('data-url')}`, 'info');
             });
+        });
+        
+        // Import XML
+        this.importBtn.addEventListener('click', () => this.importXML());
+        this.importClearBtn.addEventListener('click', () => this.clearImportResults());
+        this.importUrl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.importXML();
+        });
+        this.importXpath.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.importXML();
         });
         
         // Tabs
@@ -659,6 +681,194 @@ class AdvancedWebSocketManager {
 
     getFileExtension(format) {
         return { json: 'json', csv: 'csv', txt: 'txt' }[format] || 'txt';
+    }
+
+    // IMPORTXML FUNCTIONALITY
+    async importXML() {
+        const url = this.importUrl.value.trim();
+        const xpath = this.importXpath.value.trim();
+        const mode = this.importMode.value;
+        const limit = parseInt(this.importLimit.value) || 10;
+
+        if (!url || !xpath) {
+            this.showImportStatus('Please enter both URL and XPath', 'error');
+            return;
+        }
+
+        this.showImportStatus('Fetching data...', 'loading');
+        this.importBtn.disabled = true;
+
+        try {
+            // Fetch the data
+            const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+            const data = await response.json();
+            const content = data.contents;
+
+            // Parse XML/HTML
+            let parser = new DOMParser();
+            let xmlDoc = null;
+
+            if (mode === 'auto') {
+                try {
+                    xmlDoc = parser.parseFromString(content, 'application/xml');
+                } catch {
+                    xmlDoc = parser.parseFromString(content, 'text/html');
+                }
+            } else if (mode === 'xml') {
+                xmlDoc = parser.parseFromString(content, 'application/xml');
+            } else {
+                xmlDoc = parser.parseFromString(content, 'text/html');
+            }
+
+            // Evaluate XPath
+            const results = this.evaluateXPath(xmlDoc, xpath, limit);
+
+            if (results.length === 0) {
+                this.showImportStatus('No results found for XPath expression', 'error');
+            } else {
+                this.showImportStatus(`✅ Found ${results.length} result(s)`, 'success');
+                this.displayImportResults(results, xpath);
+                this.addToImportHistory(url, xpath, results.length);
+            }
+        } catch (error) {
+            this.showImportStatus(`Error: ${error.message}`, 'error');
+        } finally {
+            this.importBtn.disabled = false;
+        }
+    }
+
+    evaluateXPath(xmlDoc, xpath, limit) {
+        const results = [];
+        try {
+            const snapshot = xmlDoc.evaluate(
+                xpath,
+                xmlDoc,
+                null,
+                XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+                null
+            );
+
+            for (let i = 0; i < Math.min(snapshot.snapshotLength, limit); i++) {
+                const node = snapshot.snapshotItem(i);
+                if (node.nodeType === Node.TEXT_NODE) {
+                    results.push(node.nodeValue);
+                } else if (node.nodeType === Node.ATTRIBUTE_NODE) {
+                    results.push(node.nodeValue);
+                } else {
+                    results.push(node.textContent || node.outerHTML);
+                }
+            }
+        } catch (error) {
+            throw new Error(`Invalid XPath: ${error.message}`);
+        }
+        return results;
+    }
+
+    displayImportResults(results, xpath) {
+        this.importResults.innerHTML = '';
+
+        // Create table if results look like they should be in a table
+        if (results.length > 1 && results.every(r => typeof r === 'string' && r.length < 200)) {
+            const table = document.createElement('table');
+            table.className = 'import-results-table';
+            
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            const headerCell = headerRow.insertCell();
+            headerCell.textContent = `Results (${results.length})`;
+            headerCell.style.fontWeight = '600';
+
+            const tbody = table.createTBody();
+            results.forEach((result, index) => {
+                const row = tbody.insertRow();
+                const cell = row.insertCell();
+                cell.textContent = result;
+            });
+
+            this.importResults.appendChild(table);
+        } else {
+            // Display as list
+            results.forEach((result, index) => {
+                const div = document.createElement('div');
+                div.className = 'import-result-item';
+                div.innerHTML = `
+                    <strong>Result ${index + 1}:</strong><br>
+                    ${this.escapeHtml(result.substring(0, 500))}${result.length > 500 ? '...' : ''}
+                `;
+                this.importResults.appendChild(div);
+            });
+        }
+
+        // Add export button
+        const exportBtn = document.createElement('button');
+        exportBtn.className = 'btn btn-primary';
+        exportBtn.style.marginTop = '15px';
+        exportBtn.textContent = '💾 Export Results';
+        exportBtn.addEventListener('click', () => {
+            const content = JSON.stringify(results, null, 2);
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `importxml-results-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        this.importResults.appendChild(exportBtn);
+    }
+
+    showImportStatus(message, type) {
+        this.importStatus.style.display = 'block';
+        this.importStatus.className = `import-status-${type}`;
+        this.importStatus.textContent = message;
+    }
+
+    clearImportResults() {
+        this.importResults.innerHTML = '';
+        this.importStatus.style.display = 'none';
+    }
+
+    addToImportHistory(url, xpath, resultCount) {
+        this.importQueries.unshift({
+            url,
+            xpath,
+            resultCount,
+            timestamp: new Date().toLocaleString()
+        });
+
+        // Keep only last 10
+        if (this.importQueries.length > 10) {
+            this.importQueries.pop();
+        }
+
+        this.renderImportHistory();
+    }
+
+    renderImportHistory() {
+        this.importHistory.innerHTML = '';
+
+        if (this.importQueries.length === 0) {
+            this.importHistory.innerHTML = '<p style="color: #999;">No recent queries. Start by importing data above.</p>';
+            return;
+        }
+
+        this.importQueries.forEach((query, index) => {
+            const div = document.createElement('div');
+            div.className = 'import-history-item';
+            div.innerHTML = `
+                <div class="import-history-url" title="${query.url}">${query.url}</div>
+                <div class="import-history-xpath" title="${query.xpath}">${query.xpath}</div>
+                <div class="import-history-time">${query.timestamp} (${query.resultCount} results)</div>
+            `;
+            div.addEventListener('click', () => {
+                this.importUrl.value = query.url;
+                this.importXpath.value = query.xpath;
+                this.switchTab('import');
+            });
+            this.importHistory.appendChild(div);
+        });
     }
 }
 

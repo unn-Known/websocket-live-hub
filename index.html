@@ -25,6 +25,7 @@
             <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
             <button class="tab-btn" data-tab="alerts">🔔 Alerts</button>
             <button class="tab-btn" data-tab="history">📋 History</button>
+            <button class="tab-btn" data-tab="import">📥 Import XML</button>
             <button class="tab-btn" data-tab="export">💾 Export</button>
         </nav>
 
@@ -259,6 +260,68 @@
                         <h3>Export Preview</h3>
                         <pre id="exportPreview">No data to export yet. Connect and receive messages first.</pre>
                     </div>
+                </section>
+            </div>
+
+            <!-- IMPORT XML TAB -->
+            <div class="tab-content" id="import-tab">
+                <section class="card">
+                    <h2>📥 IMPORTXML - Extract Data from URLs</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Similar to Google Sheets IMPORTXML function. Fetch and parse XML/HTML data using XPath expressions.</p>
+                    
+                    <div class="form-group">
+                        <label for="importUrl">Source URL:</label>
+                        <input 
+                            type="text" 
+                            id="importUrl" 
+                            placeholder="https://example.com/data.xml"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="importXpath">XPath Expression:</label>
+                        <input 
+                            type="text" 
+                            id="importXpath" 
+                            placeholder="e.g., //price, //item[@id='123']/name, /root/data/value"
+                        >
+                        <small style="color: #999; display: block; margin-top: 8px;">
+                            Examples: //tag, /root/child, //tag[@attribute='value'], //tag[1]/text()
+                        </small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="importMode">Parse Mode:</label>
+                            <select id="importMode">
+                                <option value="xml">XML</option>
+                                <option value="html">HTML</option>
+                                <option value="auto">Auto Detect</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="importLimit">Result Limit:</label>
+                            <input type="number" id="importLimit" min="1" max="1000" value="10" placeholder="Max results">
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="importBtn" class="btn btn-primary">🔍 Import Data</button>
+                        <button id="importClearBtn" class="btn btn-secondary">Clear Results</button>
+                    </div>
+
+                    <div id="importStatus" style="margin-top: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
+                </section>
+
+                <section class="card">
+                    <h2>Results</h2>
+                    <div id="importResults" class="import-results"></div>
+                </section>
+
+                <section class="card">
+                    <h2>Recent Queries</h2>
+                    <div id="importHistory" class="import-history"></div>
                 </section>
             </div>
         </main>
